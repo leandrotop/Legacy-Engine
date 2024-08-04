@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Three.js ColladaLoader Example</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+    #file-input { display: none; }
+    button { position: absolute; top: 10px; left: 10px; }
+  </style>
+</head>
+<body>
+  <button id="load-button">Abrir DAE</button>
+  <input type="file" id="file-input" accept=".dae">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./api-Three.js",
+        "three/addons/": "./",
+        "ColladaLoader": "./api-dae.js"
+      }
+    }
+  </script>
+  <script src="api-ammo.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { ColladaLoader } from 'ColladaLoader';
+
+    let scene, camera, renderer;
+
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(5, 10, 7.5);
+      scene.add(light);
+
+      camera.position.z = 10;
+      camera.position.y = 5;
+
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', function () {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    document.getElementById('load-button').addEventListener('click', function() {
+      document.getElementById('file-input').click();
+    });
+
+    document.getElementById('file-input').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const contents = e.target.result;
+
+        // Criando um blob URL para o conteúdo do arquivo
+        const blob = new Blob([contents], { type: 'text/xml' });
+        const url = URL.createObjectURL(blob);
+        
+        const loader = new ColladaLoader();
+        loader.load(url, function (collada) {
+          const model = collada.scene;
+          model.scale.set(0.5, 0.5, 0.5);
+          scene.add(model);
+        });
+      };
+
+      reader.readAsText(file);
+    });
+
+    init();
+  </script>
+</body>
+</html>

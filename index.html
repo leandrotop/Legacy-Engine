@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LGE</title>
+    <style>
+        *{
+            margin: 0px;
+            color: #3b3b3b;
+            scrollbar-width: none;
+        }
+        body{
+            background-color: #f5f5f5;
+        }
+        h3{
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 500;
+            color: #3b3b3b;
+        }
+        button{
+            background-color: #f5f5f5;
+            height: 20px;
+            border: none;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 500;
+            color: #3b3b3b;
+        }
+        button:hover{
+            background-color: #eeeeee;
+        }
+        input{
+            background-color: #eeeeee;
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+        }
+        .top{
+            overflow-x: auto;
+            display: flex;
+            align-items: center;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 20px;
+            border-bottom: solid 1px #d3d3d3;
+        }
+        .info{
+            overflow-y: auto;
+            position: absolute;
+            top: 21px;
+            left: 0px;
+            width: 100px;
+            border-right: solid 1px #d3d3d3;
+            border-bottom: solid 1px #d3d3d3;
+        }
+        .container{
+            position: absolute;
+            top: 21px;
+            right: 0px;
+            width: calc(100vw - 201px);
+            height: calc(100vh - 21px);
+            border-left: solid 1px #d3d3d3;
+        }
+        .obj{
+            overflow-y: auto;
+            position: absolute;
+            top: 21px;
+            left: 0px;
+            width: 200px;
+            height: calc(100vh - 21px);
+        }
+        .arvore{
+            overflow: auto;
+            background-color: #eeeeee;
+            width: 160px;
+            height: 200px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+        .transform{
+            display: flex;
+            flex-direction: row;
+            position: absolute;
+            top: 30px;
+            left: 210px;
+        }
+        .script{
+            background-color: #eeeeee;
+            position: absolute;
+            top: 21px;
+            left: 0px;
+            width: 100vw;
+            height: calc(100vh - 21px);
+        }
+        .play{
+            background-color: #eeeeee;
+            position: absolute;
+            top: 21px;
+            left: 0px;
+            width: 100vw;
+            height: calc(100vh - 21px);
+        }
+        .dae{
+            background-color: #eeeeee;
+            overflow-y: auto;
+            position: absolute;
+            top: 31px;
+            left: 10px;
+            width: 300px;
+            height: 200px;
+            border: solid 1px #d3d3d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="top">
+        <button onclick="tela.top('file')" id="btn-file">File</button>
+        <button style="display: none;" onclick="tela.top('add')" id="btn-add">Add</button>
+        <button style="display: none;" onclick="remover()" id="btn-delete">Delete</button>
+        <button style="display: none;" onclick="tela.editor('editor')" id="btn-editor">Editor</button>
+        <button onclick="tela.editor('script')" id="btn-script">Script</button>
+        <button id="btn-material">Material</button>
+        <button onclick="tela.editor('play')" id="btn-play">Play</button>
+        <button style="display: none;" onclick="saveScript()" id="btn-saveScript">Save</button>
+    </div>
+    <div style="display: block;" id="editor">
+        <div class="container" id="container"></div>
+        <div class="transform">
+            <button onclick="transformStatus(1)">T</button>
+            <button onclick="transformStatus(2)">R</button>
+            <button style="display: none;" onclick="transformStatus(3)" id="btn-scale">S</button>
+            <button style="display: none;" onclick="ativarCamera()" id="btn-camera">A</button>
+        </div>
+        <div class="obj">
+            <div style="width: 100%; padding-bottom: 20px;" id="obj">
+                <div class="arvore">
+                    <div style="width: 1000px;" id="arvore">
+                    </div>
+                </div>
+                <div id="nome">
+                    <h3 style="font-size: 15px; margin-top: 20px; margin-left: 10px;">Name</h3>
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="text" onchange="updateNome()" id="inp-Nome">
+                </div>
+                <div id="Collision">
+                    <h3 style="font-size: 15px; margin-top: 20px; margin-left: 10px;">Collision</h3>
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateCollision()" id="inp-Collision">
+                </div>
+                <div id="transform">
+                    <h3 style="font-size: 15px; margin-top: 20px; margin-left: 10px;">Transform</h3>
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateTransform()" id="inp-TransformX">
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateTransform()" id="inp-TransformY">
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateTransform()" id="inp-TransformZ">
+                </div>
+                <div id="rotation">
+                    <h3 style="font-size: 15px; margin-top: 20px; margin-left: 10px;">Rotation</h3>
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateRotation()" id="inp-RotationX">
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateRotation()" id="inp-RotationY">
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateRotation()" id="inp-RotationZ">
+                </div>
+                <div id="scale">
+                    <h3 style="font-size: 15px; margin-top: 20px; margin-left: 10px;">Scale</h3>
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateScale()" id="inp-ScaleX">
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateScale()" id="inp-ScaleY">
+                    <input style="width: 170px; margin-top: 10px; margin-left: 10px;" type="number" onchange="updateScale()" id="inp-ScaleZ">
+                </div>
+                <div id="shadow">
+                    <h3 style="font-size: 15px; margin-top: 20px; margin-left: 10px;">Shadow</h3>
+                    <div style="display: flex; flex-direction: row;">
+                        <input style="margin-top: 10px; margin-left: 10px;" type="checkbox" onclick="updateShadow()" id="inp-casts">
+                        <h3 style="font-size: 15px; margin-top: 10px; margin-left: 10px;">Cast shadow</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: row;" id="div-receive">
+                        <input style="margin-top: 10px; margin-left: 10px;" type="checkbox" onclick="updateShadow()" id="inp-receives">
+                        <h3 style="font-size: 15px; margin-top: 10px; margin-left: 10px;">Receive shadow</h3>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 100%;" id="config">
+            </div>
+        </div>
+    </div>
+    <div class="script" style="display: none;" id="script">
+    </div>
+    <iframe class="play" style="display: none;" src="" frameborder="0" id="play"></iframe>
+    <div class="info" style="display: none;" id="info">
+        <div class="file" id="file">
+            <button style="text-align: start; width: 100%;" onclick="tela.top('close')">Close</button>
+            <button style="text-align: start; width: 100%; border-top: solid 1px #d3d3d3;" onclick="engineSave()">Save</button>
+            <button style="text-align: start; width: 100%;" onclick="engineOpen(1)">Open</button>
+            <button style="text-align: start; width: 100%; border-top: solid 1px #d3d3d3;" onclick="openFullscreen()">Full Screen</button>
+        </div>
+        <div class="add" style="display: none;" id="add">
+            <button style="text-align: start; width: 100%;" onclick="tela.top('close')">Close</button>
+            <button style="text-align: start; width: 100%; border-top: solid 1px #d3d3d3;" onclick="add('camera')">Camera</button>
+            <button style="text-align: start; width: 100%; border-top: solid 1px #d3d3d3;" onclick="add('box')">Box</button>
+            <button style="text-align: start; width: 100%;" onclick="add('Sphere')">Sphere</button>
+            <button style="text-align: start; width: 100%;" onclick="add('Capsule')">Capsule</button>
+            <button style="text-align: start; width: 100%;" onclick="add('Plane')">Plane</button>
+            <button style="text-align: start; width: 100%;" onclick="add('Cone')">Cone</button>
+            <button style="text-align: start; width: 100%; border-top: solid 1px #d3d3d3;" onclick="add('Spot')">Spot</button>
+            <button style="text-align: start; width: 100%;" onclick="add('Point')">Point</button>
+            <button style="text-align: start; width: 100%; border-top: solid 1px #d3d3d3;" onclick="dae('arquivo')">Dae</button>
+        </div>
+    </div>
+    <div class="dae" style="display: none;" id="div-dae(arquivo)">
+        <input type="file" id="dae-file">
+        <div style="width: 100%;" id="div-dae(file)">
+        </div>
+    </div>
+    <div class="dae" style="display: none;" id="div-open(arquivo)">
+        <input type="file" onchange="engineOpen()" id="open-file">
+    </div>
+    <script>
+        infoDiv = document.getElementById('info')
+        fileDiv = document.getElementById('file')
+        addDiv = document.getElementById('add')
+        tela = {
+            top: function (tela_) {
+                infoDiv.style.display = 'block'
+                fileDiv.style.display = 'none'
+                addDiv.style.display = 'none'
+                if (tela_ == 'close') {
+                    infoDiv.style.display = 'none'
+                }
+                if (tela_ == 'file') {
+                    fileDiv.style.display = 'block'
+                }
+                if (tela_ == 'add') {
+                    addDiv.style.display = 'block'
+                }
+            },
+            editor: function (tela_) {
+                document.getElementById('editor').style.display = 'none'
+                document.getElementById('script').style.display = 'none'
+                document.getElementById('play').style.display = 'none'
+                document.getElementById('btn-file').style.display = 'none'
+                document.getElementById('btn-add').style.display = 'none'
+                document.getElementById('btn-delete').style.display = 'none'
+                document.getElementById('btn-editor').style.display = 'none'
+                document.getElementById('btn-script').style.display = 'none'
+                document.getElementById('btn-material').style.display = 'none'
+                document.getElementById('btn-play').style.display = 'none'
+                document.getElementById('btn-saveScript').style.display = 'none'
+                if (tela_ == 'editor') {
+                    renderEngine = true
+                    updateEngine()
+                    document.getElementById('btn-file').style.display = 'block'
+                    document.getElementById('btn-script').style.display = 'block'
+                    document.getElementById('btn-material').style.display = 'block'
+                    document.getElementById('btn-play').style.display = 'block'
+                    document.getElementById('editor').style.display = 'block'
+                    document.getElementById('play').src = ''
+                }
+                if (tela_ == 'script') {
+                    document.getElementById('btn-editor').style.display = 'block'
+                    document.getElementById('btn-saveScript').style.display = 'block'
+                    document.getElementById('script').style.display = 'block'
+                    onload()
+                }
+                if (tela_ == 'play') {
+                    document.getElementById('btn-editor').style.display = 'block'
+                    document.getElementById('play').style.display = 'block'
+                    play()
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
+    <script src="api-dexie.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./api-Three.js",
+                "three/addons/": "./",
+                "OrbitControls": "./api-OrbitControls.js",
+                "TransformControls": "./api-TransformControls.js",
+                "ColladaLoader": "./api-dae.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'OrbitControls';
+        import { TransformControls } from 'TransformControls';
+        import { ColladaLoader } from 'ColladaLoader';
+
+        const container = document.getElementById('container')
+        const width = container.clientWidth
+        const height = container.clientHeight
+        const renderer = new THREE.WebGLRenderer()
+        renderer.setSize(width, height)
+        renderer.shadowMap.enabled = true
+        container.appendChild(renderer.domElement)
+        window.scene = new THREE.Scene()
+        const loader = new ColladaLoader()
+
+        function init (open_) {
+            function findVariable(obj, targetKey) {
+                if (typeof obj !== 'object' || obj === null) {
+                    return null;
+                }
+                for (let key in obj) {
+                    if (key === targetKey) {
+                        return obj[key]
+                    }
+                    const result = findVariable(obj[key], targetKey);
+                    if (result !== null) {
+                        return result
+                    }
+                }
+                return null
+            }
+
+            function removeVariable(obj_, targetKey) {
+                if (typeof obj_ !== 'object' || obj_ === null) {
+                    return false;
+                }
+                for (let key in obj_) {
+                    if (key === targetKey) {
+                        delete obj_[key];
+                        return true;
+                    }
+                    if (removeVariable(obj_[key], targetKey)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            const geometryBox = new THREE.BoxGeometry()
+            const geometrySphere = new THREE.SphereGeometry(1, 15, 15)
+            const geometryCapsule = new THREE.CapsuleGeometry(1, 2, 8, 8)
+            const geometryPlane = new THREE.PlaneGeometry(5, 5)
+            const geometryCone = new THREE.ConeGeometry(1, 1, 15)
+            const material = new THREE.MeshStandardMaterial({ color: 0xffffff })
+
+            if (open_) {
+                window.engine = {
+                    script: '',
+                    editor: {
+                        status: true
+                    },
+                    arvore: {
+                        scene: {
+                            id: 'scene',
+                            nome: 'Scene',
+                            obj1: {
+                                id: 'obj1',
+                                nome: 'Camera'
+                            },
+                            obj2: {
+                                id: 'obj2',
+                                nome: 'AmbientLight'
+                            },
+                            obj3: {
+                                id: 'obj3',
+                                nome: 'DirectionalLight'
+                            }
+                        }
+                    },
+                    scene: {
+                        background: 0xeeeeee,
+                        id: 3,
+                        camera: 'obj1',
+                        obj1: {
+                            three: '',
+                            id: 'obj1',
+                            nome: 'camera',
+                            tipo: 'camera',
+                            position: {
+                                x: 0,
+                                y: 0,
+                                z: 5
+                            },
+                            rotation: {
+                                x: 0,
+                                y: 0,
+                                z: 0
+                            },
+                            scale: {
+                                x: 1,
+                                y: 1,
+                                z: 1
+                            },
+                            add: scene,
+                            addGame: 'scene'
+                        },
+                        obj2: {
+                            three: '',
+                            id: 'obj2',
+                            nome: 'AmbientLight',
+                            tipo: 'luzAmbient',
+                            position: {
+                                x: 0,
+                                y: 0,
+                                z: 0
+                            },
+                            rotation: {
+                                x: 0,
+                                y: 0,
+                                z: 0
+                            },
+                            scale: {
+                                x: 1,
+                                y: 1,
+                                z: 1
+                            },
+                            castShadow: false,
+                            intensity: 1,
+                            add: scene,
+                            addGame: 'scene'
+                        },
+                        obj3: {
+                            three: '',
+                            id: 'obj3',
+                            nome: 'DirectionalLight',
+                            tipo: 'luzDirectional',
+                            position: {
+                                x: 5,
+                                y: 5,
+                                z: 5
+                            },
+                            rotation: {
+                                x: 0,
+                                y: 0,
+                                z: 0
+                            },
+                            scale: {
+                                x: 1,
+                                y: 1,
+                                z: 1
+                            },
+                            castShadow: true,
+                            intensity: 1,
+                            add: scene,
+                            addGame: 'scene'
+                        },
+                    },
+                    dae: {
+                        id: 0
+                    }
+                }
+            }
+            engine.scene.obj1.three = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+            window.exe = function () {
+                limparCena()
+                for (let i= 1; i <= engine.scene.id; i++) {
+                    if (engine.scene['obj' + i] !== null) {
+                        engineAdd(engine.scene['obj' + i])
+                    }
+                }
+            }
+            exe()
+
+            scene.background = new THREE.Color(engine.scene.background)
+            let controls = new OrbitControls(engine.scene.obj1.three, renderer.domElement)
+            function engineAdd(obj) {
+                if (obj.tipo == 'camera') {
+                    if (obj.id !== 'obj1') {
+                        obj.three = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+                    }
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+                if (obj.tipo == 'obj') {
+                    if (obj.tipoObj == 'box') {
+                        obj.three = new THREE.Mesh(geometryBox, material)
+                    }
+                    if (obj.tipoObj == 'sphere') {
+                        obj.three = new THREE.Mesh(geometrySphere, material)
+                    }
+                    if (obj.tipoObj == 'capsule') {
+                        obj.three = new THREE.Mesh(geometryCapsule, material)
+                    }
+                    if (obj.tipoObj == 'plane') {
+                        obj.three = new THREE.Mesh(geometryPlane, material)
+                    }
+                    if (obj.tipoObj == 'cone') {
+                        obj.three = new THREE.Mesh(geometryCone, material)
+                    }
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    obj.three.castShadow = obj.castShadow
+                    obj.three.receiveShadow = obj.receiveShadow
+                    obj.three.colisao = 0
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+                if (obj.tipo == 'luzAmbient') {
+                    obj.three = new THREE.AmbientLight(0xffffff)
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    obj.three.castShadow = obj.castShadow
+                    obj.three.intensity = obj.intensity
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+                if (obj.tipo == 'luzDirectional') {
+                    obj.three = new THREE.DirectionalLight(0xffffff, 0.5)
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    obj.three.castShadow = obj.castShadow
+                    obj.three.intensity = obj.intensity
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+                if (obj.tipo == 'luzSpot') {
+                    obj.three = new THREE.SpotLight(0xffffff, 1)
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    obj.three.castShadow = obj.castShadow
+                    obj.three.angle = obj.angle
+                    obj.three.penumbra = obj.penumbra
+                    obj.three.decay = obj.decay
+                    obj.three.distance = obj.distance
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+                if (obj.tipo == 'luzPoint') {
+                    obj.three = new THREE.PointLight(0xffffff, 1, 100)
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    obj.three.castShadow = obj.castShadow
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+                if (obj.tipo == 'dae') {
+                    let collada = loader.parse([obj.reader])
+                    obj.three = collada.scene
+                    obj.three.position.set(obj.position.x, obj.position.y, obj.position.z)
+                    obj.three.rotation.set(obj.rotation.x, obj.rotation.y, obj.rotation.z)
+                    obj.three.scale.set(obj.scale.x, obj.scale.y, obj.scale.z)
+                    obj.three.castShadow = obj.castShadow
+                    obj.three.receiveShadow = obj.receiveShadow
+                    if (obj.addGame == 'scene') {
+                        eval(`${obj.addGame}.add(obj.three)`)
+                    } else {
+                        eval(`engine.scene.${obj.addGame}.three.add(obj.three)`)
+                    }
+                }
+            }
+
+            window.renderEngine = true
+            window.updateEngine = function () {
+                controls.update()
+                let camera_ = engine.scene[engine.scene.camera]
+                renderer.render(scene, camera_.three)
+                if (renderEngine) {
+                    requestAnimationFrame(updateEngine)
+                }
+            }
+            updateEngine()
+
+            function resizeTela(params) {
+                engine.scene.obj1.three.aspect = width / height
+                engine.scene.obj1.three.updateProjectionMatrix()
+                renderer.setSize(width, height)
+            }
+            window.addEventListener('resize', () => {
+                resizeTela()
+            })
+            resizeTela()
+
+            function limparCena() {
+                while(scene.children.length > 0){ 
+                    scene.remove(scene.children[0]); 
+                }
+            }
+
+            let sec = scene
+            let secArvore = engine.arvore.scene
+            window.add = function (tipo, reader_) {
+                if (tipo == 'camera') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        tipo: 'camera',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 5
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'camera' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'box') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        nome: 'box' + engine.scene.id,
+                        tipo: 'obj',
+                        tipoObj: 'box',
+                        ammo: 0,
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        receiveShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'box' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'Sphere') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        tipo: 'obj',
+                        tipoObj: 'sphere',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        receiveShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'Sphere' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'Capsule') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: new THREE.Mesh(geometryCapsule, material),
+                        id: 'obj' + engine.scene.id,
+                        tipo: 'obj',
+                        tipoObj: 'capsule',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        receiveShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'Capsule' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'Plane') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        tipo: 'obj',
+                        tipoObj: 'plane',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        receiveShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'Plane' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'Cone') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        tipo: 'obj',
+                        tipoObj: 'cone',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        receiveShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'Cone' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'Spot') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        tipo: 'luzSpot',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        angle: Math.PI / 4,
+                        penumbra: 0.1,
+                        decay: 2,
+                        distance: 200,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'SpotLight' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'Point') {
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        nome: 'Point' + engine.scene.id,
+                        tipo: 'luzPoint',
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'PointLight' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                }
+                if (tipo == 'dae') {
+                    document.getElementById('div-dae(arquivo)').style.display = 'none'
+                    engine.scene.id += 1
+                    engine.scene['obj' + engine.scene.id] = {
+                        three: '',
+                        id: 'obj' + engine.scene.id,
+                        nome: 'dae' + engine.scene.id,
+                        tipo: 'dae',
+                        reader: reader_,
+                        ammo: 0,
+                        position: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        rotation: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        },
+                        scale: {
+                            x: 1,
+                            y: 1,
+                            z: 1
+                        },
+                        castShadow: true,
+                        receiveShadow: true,
+                        add: sec,
+                        addGame: secObj
+                    }
+                    exe()
+                    secArvore['obj' + engine.scene.id] = {
+                        id: 'obj' + engine.scene.id,
+                        nome: 'dae' + engine.scene.id
+                    }
+                    document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+
+                }
+                tela.top('close')
+            }
+
+            const transformControls = new TransformControls(engine.scene.obj1.three, renderer.domElement)
+            let ulti = 'scene'
+            let secObj = ''
+            let obj = scene
+            const inpNome = document.getElementById('inp-Nome')
+            const inpCollision = document.getElementById('inp-Collision')
+            const inpTransformX = document.getElementById('inp-TransformX')
+            const inpTransformY = document.getElementById('inp-TransformY')
+            const inpTransformZ = document.getElementById('inp-TransformZ')
+            const inpRotationX = document.getElementById('inp-RotationX')
+            const inpRotationY = document.getElementById('inp-RotationY')
+            const inpRotationZ = document.getElementById('inp-RotationZ')
+            const inpScaleX = document.getElementById('inp-ScaleX')
+            const inpScaleY = document.getElementById('inp-ScaleY')
+            const inpScaleZ = document.getElementById('inp-ScaleZ')
+            const inpCasts = document.getElementById('inp-casts')
+            const inpReceives = document.getElementById('inp-receives')
+            window.arvore = {
+                gerar: function (tree) {
+                    let html = `<button style="background-color: #eeeeee; border-radius: 5px;" onclick="arvore.secBtn('${tree.id}')" id="btn${tree.id}">${tree.nome}</button>`
+                    let content = ''
+                    for (let key in tree) {
+                        if (key !== 'id' && key !== 'nome' && typeof tree[key] === 'object') {
+                            content += arvore.gerar(tree[key], key)
+                        }
+                    } 
+                    return html + `<div style="margin-left: 10px; border-left: solid 1px #d3d3d3;" id="${tree.id}">${content}</div>`
+                }, 
+                secBtn: function (tree) {
+                    if (tree == null) {
+                        document.getElementById(`btn${ulti}`).style.backgroundColor = '#eeeeee'
+                        transformControls.detach()
+                    } else {
+                        document.getElementById(`btn${ulti}`).style.backgroundColor = '#eeeeee'
+                        if (tree == 'scene') {
+                            document.getElementById('btn-add').style.display = 'block'
+                            document.getElementById('btn-delete').style.display = 'none'
+                            transformControls.detach()
+                            sec = scene
+                            secObj = 'scene'
+                            secArvore = engine.arvore.scene
+                        } else { 
+                            document.getElementById('btn-add').style.display = 'block'
+                            document.getElementById('btn-delete').style.display = 'block'
+                            engine.scene.camera = 'obj1'
+                            sec = engine.scene[tree]
+                            sec = sec.three
+                            secObj = tree
+                            obj = engine.scene[tree]
+                            secArvore = findVariable(engine.arvore, tree)
+                            transformControls.attach(sec)
+                            scene.add(transformControls)
+                            controls.target = sec.getWorldPosition(new THREE.Vector3())
+                            if (obj.tipo == 'camera') {
+                                transformControls.setMode('translate')
+                                document.getElementById('btn-scale').style.display = 'none'
+                                document.getElementById('btn-camera').style.display = 'block'
+                                engine.scene.obj1.three.position.x = 1
+                                engine.scene.obj1.three.position.x = 1
+                                engine.scene.obj1.three.position.x = 1
+                            } else {
+                                document.getElementById('btn-scale').style.display = 'block'
+                                document.getElementById('btn-camera').style.display = 'none'
+                            }
+                            if (obj.tipo == 'obj' || obj.tipo == 'camera' || obj.tipo == 'luzAmbient' || obj.tipo == 'luzDirectional' || obj.tipo == 'luzSpot' || obj.tipo == 'luzPoint' || obj.tipo == 'dae') {
+                                document.getElementById('nome').style.display = "block"
+                            } else {
+                                document.getElementById('nome').style.display = "none"
+                                document.getElementById('Collision').style.display = 'none'
+                            }
+                            if (obj.tipoObj == 'box') {
+                                inpCollision.value = engine.scene[tree].ammo
+                                document.getElementById('Collision').style.display = 'block'
+                            } else {
+                                document.getElementById('Collision').style.display = 'none'
+                            }
+                            if (obj.tipo == 'obj' || obj.tipo == 'camera' || obj.tipo == 'luzAmbient' || obj.tipo == 'luzDirectional' || obj.tipo == 'luzSpot' || obj.tipo == 'luzPoint' || obj.tipo == 'dae') {
+                                document.getElementById('transform').style.display = "block"
+                                document.getElementById('rotation').style.display = "block"
+                                document.getElementById('scale').style.display = "block"
+                                inpNome.value = secArvore.nome
+                                inpTransformX.value = engine.scene[tree].position.x
+                                inpTransformY.value = engine.scene[tree].position.y
+                                inpTransformZ.value = engine.scene[tree].position.z
+                                inpRotationX.value = engine.scene[tree].rotation.x
+                                inpRotationY.value = engine.scene[tree].rotation.y
+                                inpRotationZ.value = engine.scene[tree].rotation.z
+                                inpScaleX.value = engine.scene[tree].scale.x
+                                inpScaleY.value = engine.scene[tree].scale.y
+                                inpScaleZ.value = engine.scene[tree].scale.z
+                            } else {
+                                document.getElementById('transform').style.display = "none"
+                                document.getElementById('rotation').style.display = "none"
+                                document.getElementById('scale').style.display = "none"
+                            }
+                            if (obj.tipo == 'obj' || obj.tipo == 'luzAmbient' || obj.tipo == 'luzDirectional' || obj.tipo == 'luzSpot' || obj.tipo == 'luzPoint' || obj.tipo == 'dae') {
+                                document.getElementById('shadow').style.display = "block"
+                                inpCasts.checked = engine.scene[tree].castShadow
+                                if (obj.tipo == 'luzAmbient' || obj.tipo == 'luzDirectional'  || obj.tipo == 'luzSpot' || obj.tipo == 'luzPoint') {
+                                    document.getElementById('div-receive').style.display = 'none'
+                                } else {
+                                    document.getElementById('div-receive').style.display = 'flex'
+                                    inpReceives.checked = engine.scene[tree].receiveShadow
+                                }
+                            } else {
+                                document.getElementById('shadow').style.display = "none"
+                            }
+                            if (obj.id == 'obj1') {
+                                document.getElementById('btn-add').style.display = 'block'
+                                document.getElementById('btn-delete').style.display = 'none'
+                                document.getElementById('btn-scale').style.display = 'none'
+                                document.getElementById('btn-camera').style.display = 'none'
+                            }
+                            if (obj.id == 'obj2') {
+                                document.getElementById('btn-add').style.display = 'block'
+                                document.getElementById('btn-delete').style.display = 'none'
+                            }
+                            if (obj.id == 'obj3') {
+                                document.getElementById('btn-add').style.display = 'block'
+                                document.getElementById('btn-delete').style.display = 'none'
+                            }
+                            
+                        }
+                        document.getElementById(`btn${tree}`).style.backgroundColor = '#dfe5ff'
+                        ulti = tree
+                    }
+                }
+            }
+            document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+            transformControls.addEventListener('mouseDown', () => {
+                controls.enabled = false
+            })
+            transformControls.addEventListener('mouseUp', () => {
+                controls.target = sec.getWorldPosition(new THREE.Vector3())
+                obj.position.x = sec.position.x
+                obj.position.y = sec.position.y
+                obj.position.z = sec.position.z
+                if (obj.tipo == 'obj' || obj.tipo == 'camera'  || obj.tipo == 'luz' || obj.tipo == 'luzSpot' || obj.tipo == 'luzPoint') {
+                    inpTransformX.value = sec.position.x
+                    inpTransformY.value = sec.position.y
+                    inpTransformZ.value = sec.position.z
+                    inpRotationX.value = sec.rotation.x
+                    inpRotationY.value = sec.rotation.y
+                    inpRotationZ.value = sec.rotation.z
+                    inpScaleX.value = sec.scale.x
+                    inpScaleY.value = sec.scale.y
+                    inpScaleZ.value = sec.scale.z
+                }
+                obj.rotation.x = sec.rotation.x
+                obj.rotation.y = sec.rotation.y
+                obj.rotation.z = sec.rotation.z
+                obj.scale.x = sec.scale.x
+                obj.scale.y = sec.scale.y
+                obj.scale.z = sec.scale.z
+                controls.enabled = true
+            })
+            window.transformStatus = function(tipo) {
+                if (tipo == 1) {
+                    transformControls.setMode('translate')
+                }
+                if (tipo == 2) {
+                    transformControls.setMode('rotate')
+                }
+                if (tipo == 3) {
+                    transformControls.setMode('scale')
+                }
+            }
+            window.ativarCamera = function () {
+                document.getElementById('btn-camera').style.display = 'none'
+                transformControls.detach()
+                engine.scene.camera = obj.id
+            }
+
+            window.updateNome = function () {
+                secArvore.nome = inpNome.value
+                document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+            }
+            window.updateCollision = function () {
+                obj.ammo = inpCollision.value
+            }
+            window.updateTransform = function () {
+                controls.target = new THREE.Vector3(sec.position.x, sec.position.y, sec.position.z )
+                obj.position.x = parseFloat(inpTransformX.value)
+                obj.position.y = parseFloat(inpTransformY.value)
+                obj.position.z = parseFloat(inpTransformZ.value)
+                sec.position.x = parseFloat(inpTransformX.value)
+                sec.position.y = parseFloat(inpTransformY.value)
+                sec.position.z = parseFloat(inpTransformZ.value)
+            }
+            window.updateRotation = function () {
+                obj.rotation.x = parseFloat(inpRotationX.value)
+                obj.rotation.y = parseFloat(inpRotationY.value)
+                obj.rotation.z = parseFloat(inpRotationZ.value)
+                sec.rotation.x = parseFloat(inpRotationX.value)
+                sec.rotation.y = parseFloat(inpRotationY.value)
+                sec.rotation.z = parseFloat(inpRotationZ.value)
+            }
+            window.updateScale = function () {
+                obj.scale.x = parseFloat(inpScaleX.value)
+                obj.scale.y = parseFloat(inpScaleY.value)
+                obj.scale.z = parseFloat(inpScaleZ.value)
+                sec.scale.x = parseFloat(inpScaleX.value)
+                sec.scale.y = parseFloat(inpScaleY.value)
+                sec.scale.z = parseFloat(inpScaleZ.value)
+            }
+            window.updateShadow = function () {
+                if (obj.tipo == 'luz' || obj.tipo == 'luzSpot' || obj.tipo == 'luzPoint') {
+                    obj.castShadow = inpCasts.checked
+                    sec.castShadow = inpCasts.checked
+                } else {
+                    obj.castShadow = inpCasts.checked
+                    sec.castShadow = inpCasts.checked
+                    obj.receiveShadow = inpReceives.checked
+                    sec.receiveShadow = inpReceives.checked
+                }
+            }
+            
+            window.remover = function name() {
+                document.getElementById('btn-add').style.display = 'none'
+                document.getElementById('btn-delete').style.display = 'none'
+                transformControls.detach()
+                if (obj.addGame == 'scene') {
+                    eval(`scene.remove(${obj.id})`)
+                } else {
+                    eval(`engine.scene.${obj.addGame}.three.remove(${obj.id})`)
+                }
+                engine.scene[secObj] = null
+                removeVariable(engine.arvore, secObj)
+                document.getElementById('arvore').innerHTML = arvore.gerar(engine.arvore.scene)
+                ulti = 'scene'
+                limparCena()
+                exe()
+            }
+
+            let editorAce = ace.edit("script")
+            window.onload = function() {
+                arvore.secBtn(null)
+                editorAce.setTheme("ace/theme/eclipse")
+                editorAce.session.setMode("ace/mode/javascript")
+                editorAce.setValue(engine.script)
+                ace.require("ace/ext/language_tools")
+                var customWords = [
+                    {caption: 'function', value: 'function', meta: 'keyword'},
+                    {caption: 'var', value: 'var', meta: 'keyword'},
+                    {caption: 'console.log', value: 'console.log()', meta: 'snippet'},
+                    {caption: 'let', value: 'let', meta: 'keyword'},
+                    {caption: 'requestAnimationFrame', value: 'requestAnimationFrame()', meta: 'keyword'},
+                    {caption: 'engine', value: 'engine', meta: 'keyword'},
+                    {caption: 'scene', value: 'scene', meta: 'keyword'},
+                    {caption: 'three', value: 'three', meta: 'keyword'},
+                    {caption: 'position', value: 'position', meta: 'keyword'},
+                    {caption: 'rotation', value: 'rotation', meta: 'keyword'},
+                    {caption: 'scale', value: 'scale', meta: 'keyword'},
+                ]
+                var customCompleter = {
+                    getCompletions: function(editor, session, pos, prefix, callback) {
+                        if (prefix.length === 0) { 
+                            callback(null, [])
+                            return
+                        }
+                        callback(null, customWords.map(function(word) {
+                            return {
+                                caption: word.caption,
+                                value: word.value,
+                                meta: word.meta
+                            }
+                        }))
+                    }
+                }
+                var langTools = ace.require("ace/ext/language_tools")
+                langTools.addCompleter(customCompleter)
+                editorAce.setOptions({
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: true,
+                    enableSnippets: true
+                })
+            }
+            window.saveScript = function () {
+                engine.script = editorAce.getValue()
+            }
+
+            const db = new Dexie('MeuBancoDeDados')
+            db.version(1).stores({
+                minhasVariaveis: 'id, valor'
+            })
+            async function armazenarVariavel(id, valor) {
+                try {
+                    await db.minhasVariaveis.put({ id, valor });
+                    console.log('Variável armazenada com sucesso');
+                } catch (error) {
+                    console.error('Erro ao armazenar a variável', error);
+                }
+            }
+            async function recuperarVariavel(id) {
+                try {
+                    let result = await db.minhasVariaveis.get(id);
+                    if (result) {
+                        console.log('Variável recuperada:', result.valor);
+                    } else {
+                        console.log('Variável não encontrada');
+                    }
+                } catch (error) {
+                    console.error('Erro ao recuperar a variável', error);
+                }
+            }
+            window.play = function () {
+                let scriptJs = ''
+                scriptJs = `
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const renderer = new THREE.WebGLRenderer()
+    renderer.setSize(width, height)
+    renderer.shadowMap.enabled = true
+    document.body.appendChild(renderer.domElement)
+    const loader = new ColladaLoader()
+
+    let scene = new THREE.Scene()
+    scene.background = new THREE.Color(${engine.scene.background})
+    let engine = {}
+    engine.collisionConfiguration = new Ammo.btDefaultCollisionConfiguration()
+    engine.dispatcher = new Ammo.btCollisionDispatcher(engine.collisionConfiguration)
+    engine.overlappingPairCache = new Ammo.btDbvtBroadphase();
+    engine.solver = new Ammo.btSequentialImpulseConstraintSolver();
+    engine.physicsWorld = new Ammo.btDiscreteDynamicsWorld(engine.dispatcher, engine.overlappingPairCache, engine.solver, engine.collisionConfiguration)
+    engine.physicsWorld.setGravity(new Ammo.btVector3(0, -9.8, 0))
+
+    const geometryBox = new THREE.BoxGeometry()
+    const geometrySphere = new THREE.SphereGeometry(1, 15, 15)
+    const geometryCapsule = new THREE.CapsuleGeometry(1, 2, 8, 8)
+    const geometryPlane = new THREE.PlaneGeometry(5, 5)
+    const geometryCone = new THREE.ConeGeometry(1, 1, 15)
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff })
+
+    //$-OBJ
+
+    //$-script
+
+    let stats = new Stats()
+    document.body.appendChild(stats.dom)
+
+    function updateEngine() {
+        engine.physicsWorld.stepSimulation(1 / 24, 10)
+        stats.update()
+        renderer.render(scene, ${engine.scene.camera})
+        requestAnimationFrame(updateEngine)
+    }
+    updateEngine()
+                `
+                for (let i= 1; i <= engine.scene.id; i++) {
+                    if (engine.scene['obj' + i] !== null) {
+                        scriptJsAdd(engine.scene['obj' + i])
+                    }
+                }
+                scriptJs = scriptJs.replace('//$-script', engine.script)
+                function scriptJsAdd(obj_) {
+                    if (obj_.tipo == 'camera') {
+                        scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    ${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj.scale.x}, ${obj.scale.y}, ${obj.scale.z})
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                    }
+                    if (obj_.tipo == 'obj') {
+                        if (obj_.tipoObj == 'box') {
+                            scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.Mesh(geometryBox, material)
+    //$-OBJ`)
+                        }
+                        if (obj_.tipoObj == 'sphere') {
+                            scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.Mesh(geometrySphere, material)
+    //$-OBJ`)
+                            obj.three
+                        }
+                        if (obj_.tipoObj == 'capsule') {
+                            scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.Mesh(geometryCapsule, material)
+    //$-OBJ`)
+                        }
+                        if (obj_.tipoObj == 'plane') {
+                            scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.Mesh(geometryPlane, material)
+    //$-OBJ`)
+                        }
+                        if (obj_.tipoObj == 'cone') {
+                            scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.Mesh(geometryCone, material)
+    //$-OBJ`)
+                        }
+                        scriptJs = scriptJs.replace('//$-OBJ', `${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj_.scale.x}, ${obj_.scale.y}, ${obj_.scale.z})
+    ${obj_.id}.castShadow = ${obj_.castShadow}
+    ${obj_.id}.receiveShadow = ${obj_.receiveShadow}
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                        if (obj_.tipo == 'obj' && obj_.tipoObj == 'box') {
+                            if (obj_.ammo == 1) {
+                                scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id}PhysicsWorld = {}
+    ${obj_.id}PhysicsWorld.Shape = new Ammo.btBoxShape(new Ammo.btVector3(${obj_.scale.x} / 2, ${obj_.scale.y} / 2, ${obj_.scale.z} / 2))
+    ${obj_.id}PhysicsWorld.Transform = new Ammo.btTransform()
+    ${obj_.id}PhysicsWorld.Transform.setIdentity()
+    ${obj_.id}PhysicsWorld.Transform.setOrigin(new Ammo.btVector3(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z}))
+    ${obj_.id}PhysicsWorld.RotationQuaternion = new THREE.Quaternion();
+    ${obj_.id}PhysicsWorld.RotationQuaternion.setFromEuler(new THREE.Euler(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z}))
+    ${obj_.id}PhysicsWorld.RotationAmmoQuat = new Ammo.btQuaternion(
+    ${obj_.id}PhysicsWorld.RotationQuaternion.x,
+    ${obj_.id}PhysicsWorld.RotationQuaternion.y,
+    ${obj_.id}PhysicsWorld.RotationQuaternion.z,
+    ${obj_.id}PhysicsWorld.RotationQuaternion.w
+    )
+    ${obj_.id}PhysicsWorld.Transform.setRotation(${obj_.id}PhysicsWorld.RotationAmmoQuat)
+    ${obj_.id}PhysicsWorld.Mass = 0
+    ${obj_.id}PhysicsWorld.MotionState = new Ammo.btDefaultMotionState(${obj_.id}PhysicsWorld.Transform)
+    ${obj_.id}PhysicsWorld.RigidBodyInfo = new Ammo.btRigidBodyConstructionInfo(
+    ${obj_.id}PhysicsWorld.Mass,
+    ${obj_.id}PhysicsWorld.MotionState,
+    ${obj_.id}PhysicsWorld.Shape,
+    new Ammo.btVector3(0, 0, 0)
+    )
+    ${obj_.id}PhysicsWorld.RigidBody = new Ammo.btRigidBody(${obj_.id}PhysicsWorld.RigidBodyInfo)
+    engine.physicsWorld.addRigidBody(${obj_.id}PhysicsWorld.RigidBody)
+
+    //$-OBJ`)
+                                
+                            }
+                            if (obj_.ammo == 2) {
+                                scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id}PhysicsWorld = {}
+    ${obj_.id}PhysicsWorld.Shape = new Ammo.btBoxShape(new Ammo.btVector3(${obj_.scale.x} / 2, ${obj_.scale.y} / 2, ${obj_.scale.z} / 2))
+    ${obj_.id}PhysicsWorld.Transform = new Ammo.btTransform()
+    ${obj_.id}PhysicsWorld.Transform.setIdentity()
+    ${obj_.id}PhysicsWorld.Transform.setOrigin(new Ammo.btVector3(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z}))
+    ${obj_.id}PhysicsWorld.RotationQuaternion = new THREE.Quaternion()
+    ${obj_.id}PhysicsWorld.RotationQuaternion.setFromEuler(new THREE.Euler(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z}))
+    ${obj_.id}PhysicsWorld.RotationAmmoQuat = new Ammo.btQuaternion(
+        ${obj_.id}PhysicsWorld.RotationQuaternion.x,
+        ${obj_.id}PhysicsWorld.RotationQuaternion.y,
+        ${obj_.id}PhysicsWorld.RotationQuaternion.z,
+        ${obj_.id}PhysicsWorld.RotationQuaternion.w
+    )
+    ${obj_.id}PhysicsWorld.Transform.setRotation(${obj_.id}PhysicsWorld.RotationAmmoQuat)
+    const ${obj_.id}Mass = 1
+    const localInertia = new Ammo.btVector3(0, 0, 0)
+    ${obj_.id}PhysicsWorld.Shape.calculateLocalInertia(${obj_.id}Mass, localInertia)
+    ${obj_.id}PhysicsWorld.MotionState = new Ammo.btDefaultMotionState(${obj_.id}PhysicsWorld.Transform)
+    ${obj_.id}PhysicsWorld.RigidBodyInfo = new Ammo.btRigidBodyConstructionInfo(
+        ${obj_.id}Mass,
+        ${obj_.id}PhysicsWorld.MotionState,
+        ${obj_.id}PhysicsWorld.Shape,
+        localInertia
+    )
+    ${obj_.id}PhysicsWorld.RigidBody = new Ammo.btRigidBody(${obj_.id}PhysicsWorld.RigidBodyInfo)
+    ${obj_.id}PhysicsWorld.RigidBody.setRestitution(0.6)
+    ${obj_.id}PhysicsWorld.RigidBody.setFriction(0.5)
+    engine.physicsWorld.addRigidBody(${obj_.id}PhysicsWorld.RigidBody)
+    function ${obj_.id}UpdatePhysics() {
+        const transform = new Ammo.btTransform()
+        ${obj_.id}PhysicsWorld.RigidBody.getMotionState().getWorldTransform(transform)
+        const origin = transform.getOrigin()
+        const rotation = transform.getRotation()
+        ${obj_.id}.position.set(origin.x(), origin.y(), origin.z())
+        ${obj_.id}.quaternion.set(rotation.x(), rotation.y(), rotation.z(), rotation.w())
+        requestAnimationFrame(${obj_.id}UpdatePhysics)
+    }
+    ${obj_.id}UpdatePhysics()
+
+    //$-OBJ`)
+                            }
+                        }
+                    }
+                    if (obj_.tipo == 'luzAmbient') {
+                        scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.AmbientLight(0xffffff)
+    ${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj_.scale.x}, ${obj_.scale.y}, ${obj_.scale.z})
+    ${obj_.id}.castShadow = ${obj_.castShadow}
+    ${obj_.id}.intensity = ${obj_.intensity}
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                    }
+                    if (obj_.tipo == 'luzDirectional') {
+                        scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.DirectionalLight(0xffffff, 0.5)
+    ${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj_.scale.x}, ${obj_.scale.y}, ${obj_.scale.z})
+    ${obj_.id}.castShadow = ${obj_.castShadow}
+    ${obj_.id}.intensity = ${obj_.intensity}
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                    }
+                    if (obj_.tipo == 'luzSpot') {
+                        scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.DirectionalLight(0xffffff, 0.5)
+    ${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj_.scale.x}, ${obj_.scale.y}, ${obj_.scale.z})
+    ${obj_.id}.castShadow = ${obj_.castShadow}
+    ${obj_.id}.angle = ${obj_.angle}
+    ${obj_.id}.penumbra = ${obj_.penumbra}
+    ${obj_.id}.decay = ${obj_.decay}
+    ${obj_.id}.distance = ${obj_.distance}
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                    }
+                    if (obj_.tipo == 'luzPoint') {
+                        scriptJs = scriptJs.replace('//$-OBJ', `let ${obj_.id} = new THREE.PointLight(0xffffff, 1, 100)
+    ${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj_.scale.x}, ${obj_.scale.y}, ${obj_.scale.z})
+    ${obj_.id}.castShadow = ${obj_.castShadow}
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                    }
+                    if (obj_.tipo == 'dae') {
+                        scriptJs = scriptJs.replace('//$-OBJ', `let collada${obj_.id} = loader.parse(\`${obj_.reader}\`)
+    let ${obj_.id} = collada${obj_.id}.scene
+    ${obj_.id}.position.set(${obj_.position.x}, ${obj_.position.y}, ${obj_.position.z})
+    ${obj_.id}.rotation.set(${obj_.rotation.x}, ${obj_.rotation.y}, ${obj_.rotation.z})
+    ${obj_.id}.scale.set(${obj_.scale.x}, ${obj_.scale.y}, ${obj_.scale.z});
+    ${obj_.id}.castShadow = ${obj_.castShadow}
+    ${obj_.id}.receiveShadow = ${obj_.receiveShadow}
+    ${obj_.addGame}.add(${obj_.id})
+
+    //$-OBJ`)
+                    }
+                }
+                console.log(scriptJs);
+                renderEngine = false
+                armazenarVariavel('engine', scriptJs).then(() => {
+                    document.getElementById('play').src = 'engine.html'
+                })
+            }
+            window.dae = function (tipo_, id_) {
+                if (tipo_ == 'arquivo') {
+                    document.getElementById('info').style.display = 'none'
+                    document.getElementById('div-dae(arquivo)').style.display = 'block'
+                    document.getElementById('div-dae(file)').innerHTML = ``
+                    for (let i = 0; i <= engine.dae.id; i++) {
+                        if (!i == 0) {
+                            dae('add', i)
+                        }
+                    }
+                }
+                if (tipo_ == 'add') {
+                    let file_ = engine.dae['obj' + id_]
+                    document.getElementById('div-dae(file)').innerHTML += `
+                    <button style="width: 100%;" onclick="add('dae', engine.dae.obj${id_}.reader)">${file_.name}</button>
+                    `
+                    file_ = null
+                }
+            }
+            document.getElementById('dae-file').addEventListener('change', function(event) {
+                openFullscreen()
+                document.getElementById('div-dae(arquivo)').style.display = 'none'
+                engine.dae.id += 1
+                let reader = new FileReader()
+                reader.onload = function(e) {
+                    const contents = e.target.result
+                    const parser = new DOMParser()
+                    let file_ = event.target.files[0]
+                    engine.dae['obj' + engine.dae.id] = {
+                        id: 'obj' + engine.dae.id,
+                        name: file_.name,
+                        reader: contents
+                    }
+                }
+                reader.readAsText(event.target.files[0])
+            })
+
+            window.engineSave = function () {
+                let save_ = JSON.stringify(engine)
+                const blob = new Blob([save_], { type: 'text/plain' })
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(blob)
+                link.download = 'game.txt'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                tela.top('close')
+            }
+            window.engineOpen = function (tipo_) {
+                document.getElementById('div-open(arquivo)').style.display = 'block'
+                tela.top('close')
+            }
+            document.getElementById('open-file').addEventListener('change', function(event) {
+                openFullscreen()
+                document.getElementById('div-open(arquivo)').style.display = 'none'
+                let reader = new FileReader()
+                reader.onload = function(e) {
+                    const contents = e.target.result
+                    engine = JSON.parse(contents)
+                    init(false)
+                }
+                reader.readAsText(event.target.files[0])
+            })
+            window.openFullscreen = function () {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+                tela.top('close')
+            }
+            window.addEventListener('resize', () => {
+                const newWidth = container.clientWidth
+                const newHeight = container.clientHeight
+                renderer.setSize(newWidth, newHeight)
+                camera_ = engine.scene[engine.scene.camera]
+                camera_.aspect = newWidth / newHeight
+                camera_.updateProjectionMatrix()
+            })
+        }
+        init(true)
+    </script>
+</body>
+</html>

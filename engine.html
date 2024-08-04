@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>engine</title>
+    <style>
+        *{
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./api-Three.js",
+                "three/addons/": "./",
+                "OrbitControls": "./api-OrbitControls.js",
+                "TransformControls": "./api-TransformControls.js",
+                "Stats": "./api-stats.js",
+                "ColladaLoader": "./api-dae.js"
+            }
+        }
+    </script>
+    <script src="api-ammo.js"></script>
+    <script src="api-dexie.js"></script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'OrbitControls';
+        import { TransformControls } from 'TransformControls';
+        import Stats from 'Stats';
+        import { ColladaLoader } from 'ColladaLoader';
+        
+        const db = new Dexie('MeuBancoDeDados')
+        db.version(1).stores({
+            minhasVariaveis: 'id, valor'
+        })
+        async function recuperarVariavel(id) {
+            try {
+                let result = await db.minhasVariaveis.get(id)
+                if (result) {
+                    eval(result.valor)
+                    console.log(result.valor);
+                }
+            } catch (error) {
+            }
+        }
+        recuperarVariavel('engine')
+    </script>
+</body>
+</html>
