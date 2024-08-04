@@ -1,5 +1,4 @@
 # Legacy-Engine
-# Game Engine Description
 Our game engine is an open-source platform specifically designed for developing simple 3D games for mobile and web. Utilizing the powerful Three.js library, our engine allows for the creation of immersive visual experiences with ease. Whether you are an experienced developer or a beginner, our engine provides the necessary tools to turn your ideas into reality without complications.
 
 # Key Features:
